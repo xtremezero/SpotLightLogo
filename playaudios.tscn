@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://Distant_Lands.ogg" type="AudioStream" id=1]
+
+[sub_resource type="GDScript" id=33]
+script/source = "extends Node
+
+onready var gameobj = get_node(\"../transformation\")
+func _process(delta):
+	if gameobj.state == 2 and gameobj.statechanged == true :
+		get_node(\"AudioStreamPlayer\").playing= true"
+
+[node name="playaudios" type="Node"]
+script = SubResource( 33 )
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 1 )
