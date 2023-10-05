@@ -1,0 +1,125 @@
+[gd_scene load_steps=10 format=3 uid="uid://bhw23a7yjw08d"]
+
+[ext_resource type="ArrayMesh" uid="uid://bq5o8w15aaaqq" path="res://ShadowPuzzle/Assets/Models.obj" id="1_htk3o"]
+
+[sub_resource type="GDScript" id="GDScript_ufp5h"]
+resource_name = "Game"
+script/source = "extends Node3D
+
+
+func _ready():
+	pass
+	
+func _process(delta):
+	pass
+
+func _on_model_transform_updated(rot:Quaternion):
+	print(rot)
+	print(rot.angle_to(Quaternion(0,0,0,0)))
+"
+
+[sub_resource type="Environment" id="Environment_40xav"]
+ambient_light_source = 2
+ambient_light_color = Color(1, 1, 1, 1)
+ambient_light_energy = 0.25
+ssr_enabled = true
+ssao_enabled = true
+ssil_enabled = true
+sdfgi_enabled = true
+glow_enabled = true
+fog_enabled = true
+volumetric_fog_enabled = true
+adjustment_enabled = true
+adjustment_contrast = 1.7
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_go5pn"]
+albedo_color = Color(0.407843, 0.862745, 0.905882, 1)
+
+[sub_resource type="GDScript" id="GDScript_hj2yn"]
+script/source = "extends Area3D
+
+signal transform_updated(Quaternion)
+
+var mouse_relative := Vector2(0,0) 
+var mouse_button := false
+var sensitivity :=0.02
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	randomize()
+	
+	rotate_x(randf()*PI+PI/2)
+	rotate_y(randf()*PI+PI/2)
+	rotate_z(randf()*PI+PI/2)
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta):
+	if (mouse_button):
+		rotate_x(sensitivity* mouse_relative.y)
+		rotate_y(sensitivity* mouse_relative.x)
+		emit_signal(\"transform_updated\",global_transform.basis.get_rotation_quaternion())
+	mouse_relative=Vector2.ZERO.lerp(mouse_relative,0.2*delta)
+	
+
+
+func _on_input_event(camera, event, position, normal, shape_idx):
+	if event is InputEventMouseMotion : 
+		mouse_relative=event.relative 
+	
+	if event is InputEventMouseButton:
+		mouse_button= event.pressed
+"
+
+[sub_resource type="Gradient" id="Gradient_v7dlj"]
+offsets = PackedFloat32Array(0)
+colors = PackedColorArray(0, 0.635294, 0.756863, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_kqhtw"]
+gradient = SubResource("Gradient_v7dlj")
+width = 1
+
+[sub_resource type="ORMMaterial3D" id="ORMMaterial3D_xvxp7"]
+albedo_color = Color(1, 0.788235, 0.470588, 1)
+orm_texture = SubResource("GradientTexture1D_kqhtw")
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_o7ijm"]
+size = Vector3(1.5, 1.5, 1.5)
+
+[node name="ShadowPuzzle" type="Node3D"]
+script = SubResource("GDScript_ufp5h")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_40xav")
+
+[node name="CSGBox3D" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 73.725, 0, -4)
+material_override = SubResource("StandardMaterial3D_go5pn")
+size = Vector3(195.56, 160.183, 1)
+
+[node name="Model" type="Area3D" parent="."]
+transform = Transform3D(7.2, 0, 0, 0, 7.2, 0, 0, 0, 7.2, 0, 0, 16.3073)
+script = SubResource("GDScript_hj2yn")
+
+[node name="Models" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.393426, 0)
+material_override = SubResource("ORMMaterial3D_xvxp7")
+mesh = ExtResource("1_htk3o")
+skeleton = NodePath("../..")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Model"]
+shape = SubResource("BoxShape3D_o7ijm")
+
+[node name="SpotLight3D" type="SpotLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 33.4202)
+shadow_enabled = true
+spot_range = 50.7
+spot_attenuation = 0.0281641
+spot_angle = 21.36
+spot_angle_attenuation = 0.0947323
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(0.85015, 0, -0.52654, 0, 1, 0, 0.52654, 0, 0.85015, -19.5465, 0, 33.175)
+current = true
+fov = 37.7
+
+[connection signal="input_event" from="Model" to="Model" method="_on_input_event"]
+[connection signal="transform_updated" from="Model" to="." method="_on_model_transform_updated"]

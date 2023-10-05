@@ -6,34 +6,18 @@
 ;   [section] ; section goes between []
 ;   param=value ; assign values to parameters
 
-config_version=4
-
-_global_script_classes=[  ]
-_global_script_class_icons={
-
-}
+config_version=5
 
 [application]
 
-config/name="shadows"
-run/main_scene="res://tutorial.tscn"
-run/disable_stdout=true
-run/disable_stderr=true
-boot_splash/image="res://logo.png"
-config/icon="res://icon.png"
+config/name="Spotlight Logo"
+config/features=PackedStringArray("4.1", "Mobile")
+config/icon="res://icon.svg"
 
-[autoload]
+[editor]
 
-timer="*res://timer.gd"
-
-[display]
-
-window/size/width=1920
-window/size/height=1080
+version_control/plugin_name="GodotVersion"
 
 [rendering]
 
-vram_compression/import_etc=true
-vram_compression/import_etc2=false
-quality/filters/msaa=2
-environment/default_environment="res://default_env.tres"
+renderer/rendering_method="mobile"

@@ -1,0 +1,5 @@
+[gd_scene load_steps=2 format=3 uid="uid://s36s3ok433t"]
+
+[ext_resource type="PackedScene" uid="uid://b2n46knm8l8hd" path="res://Assets/3dmodels.glb" id="1_jysx4"]
+
+[node name="3dmodels" instance=ExtResource("1_jysx4")]
